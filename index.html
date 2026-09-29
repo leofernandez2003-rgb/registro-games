@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mis juegos</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef0f7;--sf:#fff;--ink:#1a1d2e;--mut:#6b7090;--line:#dcdff0;--ac:#5b4bff;--acink:#fff;--star:#f5a524;
+--ok:#1fa36b;--play:#2f7bff;--wait:#a06cf0;--drop:#e5484d;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12141f;--sf:#1c2033;--ink:#e9eaf5;--mut:#9aa0c4;--line:#2c3150;--ac:#8f86ff;--acink:#12141f}}
+:root[data-theme="dark"]{--bg:#12141f;--sf:#1c2033;--ink:#e9eaf5;--mut:#9aa0c4;--line:#2c3150;--ac:#8f86ff;--acink:#12141f}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:760px;margin:0 auto;padding:24px 16px 48px}
+h1{font:800 clamp(2rem,7vw,3rem)/1 "Bricolage Grotesque",system-ui,sans-serif;margin:0 0 4px}
+.sub{color:var(--mut);margin:0 0 20px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px}
+.stat{background:var(--sf);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.stat b{display:block;font:700 1.6rem/1.1 "Bricolage Grotesque",system-ui,sans-serif}
+.stat span{color:var(--mut);font-size:.85rem}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+input,select,textarea,button{font:inherit;color:inherit}
+input,select,textarea{background:var(--sf);border:1px solid var(--line);border-radius:10px;padding:9px 12px;min-width:0}
+input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.bar input{flex:1 1 180px}
+button{cursor:pointer;background:var(--sf);border:1px solid var(--line);border-radius:10px;padding:9px 14px}
+button.pri{background:var(--ac);color:var(--acink);border-color:var(--ac);font-weight:700}
+.add{display:grid;grid-template-columns:2fr 1fr auto;gap:8px;margin-bottom:20px}
+.list{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--sf)}
+.row{display:grid;grid-template-columns:64px 1fr auto;gap:6px 12px;padding:12px 14px;border-top:1px solid var(--line);border-left:5px solid var(--c)}
+.cv{grid-row:1/3;width:64px;height:88px;border-radius:8px;overflow:hidden;display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;color:#fff;font:800 1.2rem "Bricolage Grotesque",system-ui,sans-serif}
+.cv img{width:100%;height:100%;object-fit:cover}
+.cv:focus-within{outline:2px solid var(--ac);outline-offset:2px}
+.cv input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%}
+.cv small{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.55);font:500 .6rem system-ui,sans-serif;text-align:center;padding:1px 0}
+.row:first-child{border-top:0}
+.t{font-weight:700}
+.meta{color:var(--mut);font-size:.85rem}
+.stars button{border:0;background:none;padding:0 1px;font-size:1.25rem;line-height:1;color:var(--line)}
+.stars button.on{color:var(--star)}
+.ctl{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+.ctl select{padding:6px 8px}
+.x{border:0;background:none;color:var(--mut);padding:4px 8px}
+.note{grid-column:2/-1;width:100%;padding:6px 10px;font-size:.9rem}
+.empty{padding:28px;text-align:center;color:var(--mut)}
+details{margin-top:24px;color:var(--mut)}
+details textarea{width:100%;min-height:110px;margin:8px 0;font:12px/1.4 ui-monospace,monospace}
+@media(max-width:520px){.stats{grid-template-columns:repeat(2,1fr)}.add{grid-template-columns:1fr 1fr}.add input:first-child{grid-column:1/-1}.row{grid-template-columns:64px 1fr}.cv{grid-row:auto}.ctl{grid-column:1/-1;justify-content:flex-start}.note{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<main>
+<h1>Mis juegos</h1>
+<p class="sub">Tu registro personal. Todo se guarda en este navegador.</p>
+<div class="stats" id="stats"></div>
+<details id="cfg"><summary>Portadas automáticas (RAWG)</summary>
+  <p>Pega tu clave gratuita de RAWG. Se guarda solo en este navegador.</p>
+  <input id="rk" type="password" placeholder="Clave de RAWG" aria-label="Clave de RAWG"> <button id="rks">Guardar clave</button> <button id="fc" class="pri">Buscar portadas que faltan</button>
+  <p id="fst" role="status"></p>
+</details>
+<div class="add">
+  <input id="nt" placeholder="Agregar un juego" aria-label="Título del juego">
+  <input id="np" placeholder="Plataforma (opcional)" aria-label="Plataforma">
+  <button class="pri" id="addb">Agregar</button>
+</div>
+<div class="bar">
+  <input id="q" type="search" placeholder="Buscar juego o nota" aria-label="Buscar">
+  <select id="fs" aria-label="Filtrar por estado"><option value="">Todos los estados</option><option>Terminado</option><option>Jugando</option><option>Pendiente</option><option>Abandonado</option></select>
+  <select id="so" aria-label="Ordenar"><option value="add">Orden de carga</option><option value="az">A – Z</option><option value="rt">Mejor nota</option></select>
+</div>
+<div class="list" id="list"></div>
+<details>
+  <summary>Respaldo de datos</summary>
+  <p>Copia este texto para guardar tu lista. Pégalo aquí y pulsa Restaurar para recuperarla.</p>
+  <textarea id="bk" aria-label="Respaldo"></textarea>
+  <button id="bkg">Generar respaldo</button> <button id="bkr">Restaurar</button>
+</details>
+<p class="meta">Imágenes de portadas: <a href="https://rawg.io" target="_blank" rel="noopener">RAWG</a></p>
+</main>
+<script>
+const KEY="mis-juegos-v1";
+const COL={Terminado:"var(--ok)",Jugando:"var(--play)",Pendiente:"var(--wait)",Abandonado:"var(--drop)"};
+const ST=Object.keys(COL);
+const INIT=["Marvel's Spider-Man","Marvel's Spider-Man: Miles Morales","Marvel's Spider-Man 2","Horizon Zero Dawn","Uncharted 4: A Thief's End","Days Gone","Death Stranding","Death Stranding 2: On the Beach","Star Wars Jedi: Fallen Order","Resident Evil 2 Remake","Resident Evil 3 Remake","Resident Evil 4 Remake","Resident Evil 7: Biohazard","Resident Evil Village (8)","Resident Evil 9","Alan Wake Remastered","Silent Hill 2 Remake","Assassin's Creed IV: Black Flag (Original)","Grand Theft Auto V (GTA V)"];
+let id=0;const mk=(t,p)=>({id:++id,t,p:p||"",s:"Terminado",r:0,n:""});
+let G=[];
+try{const raw=localStorage.getItem(KEY);if(raw)G=JSON.parse(raw)}catch(e){}
+if(!Array.isArray(G)||!G.length){G=INIT.map(t=>mk(t))}
+id=G.reduce((m,g)=>Math.max(m,g.id),0);
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function save(){try{localStorage.setItem(KEY,JSON.stringify(G));return true}catch(e){return false}}
+function cover(g){
+  const h=[...g.t].reduce((a,c)=>(a*31+c.charCodeAt(0))%360,7);
+  const ini=g.t.replace(/[^\p{L}\p{N} ]/gu,"").split(" ").filter(Boolean).slice(0,2).map(w=>w[0]).join("").toUpperCase();
+  return `<label class="cv" style="background:hsl(${h} 45% 36%)" title="Subir carátula">${(g.c||g.cu)?`<img src="${esc(g.c||g.cu)}" alt="Carátula de ${esc(g.t)}" loading="lazy">`:esc(ini)}<small>${(g.c||g.cu)?"Cambiar":"Subir"}</small><input type="file" accept="image/*" data-c aria-label="Subir carátula de ${esc(g.t)}"></label>`;
+}
+function setCover(g,file){
+  if(!file)return;
+  const rd=new FileReader();
+  rd.onload=()=>{const im=new Image();im.onload=()=>{
+    const w=240,k=Math.min(1,w/im.width),cv=document.createElement("canvas");
+    cv.width=Math.round(im.width*k);cv.height=Math.round(im.height*k);
+    cv.getContext("2d").drawImage(im,0,0,cv.width,cv.height);
+    const old=g.c;g.c=cv.toDataURL("image/jpeg",0.8);
+    if(!save()){g.c=old;alert("No hay espacio para guardar más carátulas en este navegador.")}
+    render()};
+    im.onerror=()=>alert("No se pudo leer esa imagen.");im.src=rd.result};
+  rd.readAsDataURL(file);
+}
+function render(){
+  const q=$("#q").value.toLowerCase(),f=$("#fs").value,o=$("#so").value;
+  let L=G.filter(g=>(!f||g.s===f)&&(!q||(g.t+" "+g.n+" "+g.p).toLowerCase().includes(q)));
+  if(o==="az")L=[...L].sort((a,b)=>a.t.localeCompare(b.t));
+  if(o==="rt")L=[...L].sort((a,b)=>b.r-a.r);
+  const c=s=>G.filter(g=>g.s===s).length,rt=G.filter(g=>g.r>0);
+  const avg=rt.length?(rt.reduce((a,g)=>a+g.r,0)/rt.length).toFixed(1):"–";
+  $("#stats").innerHTML=[[c("Terminado"),"Terminados"],[c("Jugando"),"Jugando"],[c("Pendiente"),"Pendientes"],[avg,"Nota media"]].map(x=>`<div class="stat"><b>${x[0]}</b><span>${x[1]}</span></div>`).join("");
+  $("#list").innerHTML=L.length?L.map(g=>`<div class="row" style="--c:${COL[g.s]}" data-id="${g.id}">
+    ${cover(g)}<div><div class="t">${esc(g.t)}</div><div class="meta">${g.p?esc(g.p):"Sin plataforma"}</div></div>
+    <div class="ctl"><span class="stars">${[1,2,3,4,5].map(n=>`<button data-r="${n}" class="${n<=g.r?"on":""}" aria-label="${n} estrellas">★</button>`).join("")}</span>
+    <select data-s aria-label="Estado">${ST.map(s=>`<option${s===g.s?" selected":""}>${s}</option>`).join("")}</select>
+    <button class="x" data-del aria-label="Eliminar ${esc(g.t)}">✕</button></div>
+    <input class="note" data-n placeholder="Nota personal" value="${esc(g.n)}" aria-label="Nota"></div>`).join(""):`<div class="empty">No hay juegos con ese filtro. Agrega uno arriba.</div>`;
+}
+function add(){const t=$("#nt").value.trim();if(!t)return;const g=mk(t,$("#np").value.trim());g.s="Pendiente";G.push(g);if(rkey)findCover(g).then(u=>{if(u){g.cu=u;save();render()}}).catch(()=>{});$("#nt").value="";$("#np").value="";save();render()}
+const RK="mis-juegos-rawg";
+let rkey="";try{rkey=localStorage.getItem(RK)||""}catch(e){}
+$("#rk").value=rkey;
+$("#rks").onclick=()=>{rkey=$("#rk").value.trim();try{localStorage.setItem(RK,rkey)}catch(e){}$("#fst").textContent="Clave guardada."};
+async function findCover(g){
+  const q=encodeURIComponent(g.t.replace(/\s*\(.*?\)/g,"").trim());
+  const r=await fetch(`https://api.rawg.io/api/games?key=${encodeURIComponent(rkey)}&search=${q}&page_size=1`);
+  if(!r.ok)throw new Error(r.status);
+  const d=await r.json();
+  return (d.results&&d.results[0]&&d.results[0].background_image)||"";
+}
+$("#fc").onclick=async()=>{
+  if(!rkey){$("#fst").textContent="Primero guarda tu clave de RAWG.";return}
+  const todo=G.filter(g=>!g.c&&!g.cu);let ok=0;
+  for(let i=0;i<todo.length;i++){
+    $("#fst").textContent=`Buscando ${i+1} de ${todo.length}…`;
+    try{const u=await findCover(todo[i]);if(u){todo[i].cu=u;ok++;save();render()}}
+    catch(e){$("#fst").textContent="No se pudo conectar con RAWG. Revisa la clave.";return}
+  }
+  $("#fst").textContent=`Listo: ${ok} portadas encontradas.`;
+};
+$("#addb").onclick=add;
+$("#nt").onkeydown=e=>{if(e.key==="Enter")add()};
+["#q","#fs","#so"].forEach(s=>$(s).oninput=render);
+const find=e=>{const r=e.target.closest(".row");return r&&G.find(g=>g.id==r.dataset.id)};
+$("#list").onclick=e=>{const g=find(e);if(!g)return;
+  if(e.target.dataset.r){const n=+e.target.dataset.r;g.r=g.r===n?0:n;save();render()}
+  else if(e.target.hasAttribute("data-del")&&confirm("¿Eliminar "+g.t+"?")){G=G.filter(x=>x!==g);save();render()}};
+$("#list").onchange=e=>{const g=find(e);if(!g)return;
+  if(e.target.hasAttribute("data-c")){setCover(g,e.target.files[0])}
+  else if(e.target.hasAttribute("data-s")){g.s=e.target.value;save();render()}
+  else if(e.target.hasAttribute("data-n")){g.n=e.target.value;save()}};
+$("#bkg").onclick=()=>{$("#bk").value=JSON.stringify(G)};
+$("#bkr").onclick=()=>{try{const d=JSON.parse($("#bk").value);if(Array.isArray(d)&&d.every(x=>x.t)){G=d.map((x,i)=>({id:x.id||i+1,t:String(x.t),p:x.p||"",s:ST.includes(x.s)?x.s:"Pendiente",r:+x.r||0,n:x.n||"",c:typeof x.c==="string"&&x.c.startsWith("data:image/")?x.c:"",cu:typeof x.cu==="string"&&x.cu.startsWith("https://")?x.cu:""}));id=G.reduce((m,g)=>Math.max(m,g.id),0);save();render()}else alert("El respaldo no es válido.")}catch(e){alert("El respaldo no es válido.")}};
+render();
+</script>
+</body>
+</html>
